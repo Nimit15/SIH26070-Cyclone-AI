@@ -1,0 +1,13 @@
+{
+  "best_epoch": 3,
+  "validation_macro_f1": 0.6236732366245878,
+  "category_list": [
+    "CS",
+    "D",
+    "DD",
+    "SCS",
+    "SuCS",
+    "VSCS"
+  ],
+  "wind_column": "MSWS kts"
+}
