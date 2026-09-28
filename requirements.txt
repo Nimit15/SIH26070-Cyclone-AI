@@ -1,0 +1,7 @@
+nicegui==3.17.1
+torch
+torchvision
+timm
+numpy
+Pillow
+matplotlib
