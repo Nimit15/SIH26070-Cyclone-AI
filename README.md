@@ -46,7 +46,7 @@ On the three held-out validation storms, the V4 forecast achieved:
 - +12h accuracy within one adjacent intensity class: 90.37%
 - +6h top-2 accuracy: 87.86%
 
-A simple average of the two within-one-class figures gives an overall forecast agreement of 92.88%. This is reported separately from exact six-class accuracy.
+The test-set check was run only after the model and decision rule were fixed. On the seven held-out test storms, exact six-class accuracy was 52.97% at +6h and 42.25% at +12h. The corresponding within-one-class agreement was 95.73% and 92.09%. The mean tolerance-aware agreement was 94.59%. These figures are kept separate from exact six-class accuracy.
 
 The V4 temporal model remains the main forecasting reference. A small spatial residual experiment gave only a marginal early improvement, so it was not adopted as the main model.
 
