@@ -50,6 +50,14 @@ The test-set check was run only after the model and decision rule were fixed. On
 
 The V4 temporal model remains the main forecasting reference. A small spatial residual experiment gave only a marginal early improvement, so it was not adopted as the main model.
 
+## Test alert checks
+
+The held-out test set was also checked using the fixed wind thresholds from the training set. For detecting whether a forecast is at least Severe Cyclonic Storm strength (62.5 kt), the accuracy was 95.73% at +6h and 91.88% at +12h, or 93.81% across the two horizons.
+
+At the 117.5 kt threshold, corresponding to the project's SuCS boundary, the wind estimate correctly identified the threshold condition 98.34% at +6h and 97.71% at +12h (98.02% across both horizons).
+
+These are threshold-detection results, not six-class classification accuracy.
+
 ## Repository structure
 
     checkpoints/
