@@ -1,14 +1,14 @@
-# External eye-structure experiment
+# External model checks
 
-## What we tested
+A few published or external models were tested against our North Indian Ocean data before deciding whether they belonged in the final system.
 
-We used the released DeepTCEye model on 742 original HURSAT-B1 infrared frames from five North Indian Ocean storms already selected for the project.
+## DeepTCEye / DeepTCNet
 
-The eye detector loaded successfully in its original TensorFlow 2.8 / Keras 2.8 environment. We did not change the main project environment.
+We ran the released DeepTCEye model on 742 original HURSAT-B1 infrared frames from five North Indian Ocean storms already selected for the project.
 
-We also tested the released DeepTCNet intensity model on the same 742 frames.
+The eye detector loaded in its original TensorFlow 2.8 / Keras 2.8 environment. We kept that environment separate from the main project setup.
 
-## Results
+We also tested the released DeepTCNet intensity model on the same frames.
 
 DeepTCEye:
 
@@ -16,19 +16,7 @@ DeepTCEye:
 - 70 eye-positive frames
 - eye-positive rate: 9.43%
 
-Eye-persistence counts had only weak relationships with the HURSAT wind labels:
-
-- EPI6 count correlation: 0.176
-- EPI12 count correlation: 0.178
-- EPI18 count correlation: 0.141
-- EPI24 count correlation: 0.097
-
-For the 136 frames with wind at least 80 kt, the correlations dropped further:
-
-- EPI6: 0.153
-- EPI12: 0.120
-- EPI18: 0.031
-- EPI24: 0.031
+The eye-persistence counts had only weak relationships with the HURSAT wind labels. The strongest correlation was 0.178 for EPI12, and the relationships were weaker on the stronger-storm subset.
 
 DeepTCNet transfer:
 
@@ -39,12 +27,23 @@ DeepTCNet transfer:
 - MAE for winds at least 80 kt: 32.65 kt
 - bias for winds at least 80 kt: -31.6 kt
 
-## Decision
+We left both out of the final forecasting branch. The published models did not transfer cleanly to this North Indian Ocean set, especially at high intensity.
 
-We are not adding DeepTCEye EPI or the released DeepTCNet wind prediction to the final forecasting model.
+## TCIR North Indian Ocean check
 
-The external eye signal was too weak on this North Indian Ocean subset, and the external intensity model substantially underestimated strong storms. The experiment was still useful because it gave us a direct transfer test rather than assuming that a published result would transfer to our task.
+We also pulled the Indian Ocean part of TCIR and kept a compact 1,600-frame subset covering 75 storms and winds from 15 to 145 kt. The stronger cases were deliberately kept because the main model has its biggest weakness in the upper intensity tail.
 
-The next modeling work will focus on preserving spatial evolution and using a geographically relevant external satellite dataset rather than importing a pretrained intensity output directly.
+For a quick transfer check, we trained an EfficientNet-B0 on the TCIR IR channel and kept storm years overlapping the HURSAT training set out of the run.
 
-No project test data was used.
+Validation:
+
+- 321 frames
+- 11 storms
+- best accuracy: 31.15%
+- best wind MAE: 18.01 kt
+
+The transfer was not strong enough to justify replacing the project encoder with a TCIR-pretrained one, so this branch is not being carried forward.
+
+The useful part of the TCIR work is the additional North Indian Ocean satellite data itself. We keep it as a possible representation-learning source, but not as a source of ready-made intensity predictions.
+
+No project test data was used for these checks.
