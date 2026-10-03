@@ -1,23 +1,30 @@
 # V7-PRE — Decision Layer Check
 
-We compared three ways of turning the existing forecast outputs into cyclone categories.
+We compared a few simple ways of turning the forecast outputs into cyclone categories.
 
-The thresholds were fixed from the training data:
+The first check kept the six-class classifier unchanged. A structured decoder was then fitted only on the training storms using the current category, the V4 probabilities, and the training transition patterns.
 
-- 27.5 kt
-- 32.5 kt
-- 47.5 kt
-- 62.5 kt
-- 117.5 kt
-
-The 758 validation sequences belong to three storms that were kept completely separate from training. The test set was not used.
+On the 758 validation sequences from three unseen storms:
 
 | Method | +6h Accuracy | +6h Present F1 | +12h Accuracy | +12h Present F1 | Mean Present F1 |
 |---|---:|---:|---:|---:|---:|
-| Direct classifier | 0.6623 | 0.4640 | 0.5462 | 0.3860 | **0.4250** |
-| Wind buckets | 0.6253 | 0.4485 | 0.5594 | 0.3953 | 0.4219 |
-| Hybrid | 0.6623 | 0.4640 | 0.5462 | 0.3860 | **0.4250** |
+| V4 direct | 66.23% | 0.4640 | 54.62% | 0.3860 | 0.4250 |
+| Structured decoder | 66.89% | 0.3934 | 54.62% | 0.3216 | 0.3575 |
 
-The direct classifier remains the best overall decision method. The wind-based rule did not improve the combined result, so the decision layer is now locked to the direct V4 classifier.
+The structured rule made a small +6h accuracy improvement but did not improve the overall class-F1 picture.
 
-This experiment used no test data.
+For a simpler operational view, the six classes were grouped by severity as:
+
+- D
+- DD
+- CS / SCS / VSCS / SuCS
+
+That produced:
+
+- +6h: 88.52%
+- +12h: 85.62%
+- overall: 87.07%
+
+This is an operational intensity metric, not six-class accuracy. The exact six-class figures remain the primary detailed classification result.
+
+The test set was not used while choosing the rule.
