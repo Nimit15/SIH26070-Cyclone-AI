@@ -14,7 +14,6 @@ from nicegui import ui
 
 
 CATEGORIES = ["CS", "D", "DD", "SCS", "SuCS", "VSCS"]
-SUCS_THRESHOLD = 117.5
 
 PROJECT = Path(__file__).resolve().parent
 MODEL_PATH = PROJECT / "checkpoints" / "cyclone_best.pt"
@@ -290,28 +289,13 @@ async def analyze_upload(
 
             predicted_wind = wind.item()
 
-        if predicted_wind >= SUCS_THRESHOLD:
+        final_category = classifier_category
 
-            final_category = "SuCS"
-
-            reason = (
-                f"Wind estimate "
-                f"{predicted_wind:.1f} kt "
-                f"exceeds the "
-                f"{SUCS_THRESHOLD:.1f} kt "
-                f"SuCS threshold."
-            )
-
-        else:
-
-            final_category = (
-                classifier_category
-            )
-
-            reason = (
-                "Final category follows "
-                "the visual classifier."
-            )
+        reason = (
+            "Final category follows "
+            "the visual classifier. "
+            f"Wind estimate: {predicted_wind:.1f} kt."
+        )
 
         cam = generate_gradcam(
             tensor,
