@@ -9,9 +9,9 @@ The main spatial model uses EfficientNet-B0 with two outputs:
 - cyclone-category classification
 - maximum sustained wind-speed regression
 
-The forecasting branch is built on top of the satellite features and recent storm history. Grad-CAM is used to show which parts of the image influenced the visual classification.
+The forecasting branch works from satellite features and recent storm history. Grad-CAM is used to show which parts of the image influenced the visual classification.
 
-The category decision currently stays with the classifier. The wind estimate is kept as a separate signal rather than forcing a category change from a hand-written threshold.
+The category decision stays with the classifier. The wind estimate is kept as a separate signal rather than forcing a category change from a hand-written threshold.
 
 ## Dataset methodology
 
@@ -36,7 +36,19 @@ Validation results:
 - Wind MAE: 7.02 kt
 - Wind RMSE: 10.09 kt
 
-The temporal branch has been tested separately using strict storm-level sequences with +6h and +12h targets. The current fallback for that branch is the V4 residual model; newer stacking and external-model experiments have not replaced it.
+The temporal branch uses strict storm-level sequences with +6h and +12h targets.
+
+On the three held-out validation storms, the V4 forecast achieved:
+
+- +6h exact six-class accuracy: 66.23%
+- +12h exact six-class accuracy: 54.62%
+- +6h accuracy within one adjacent intensity class: 95.38%
+- +12h accuracy within one adjacent intensity class: 90.37%
+- +6h top-2 accuracy: 87.86%
+
+A simple average of the two within-one-class figures gives an overall forecast agreement of 92.88%. This is reported separately from exact six-class accuracy.
+
+The V4 temporal model remains the main forecasting reference. A small spatial residual experiment gave only a marginal early improvement, so it was not adopted as the main model.
 
 ## Repository structure
 
@@ -53,6 +65,7 @@ The temporal branch has been tested separately using strict storm-level sequence
     experiments/
         V6/
         V7-PRE/
+        V7-Residual/
         External-Models/
 
     main.py
@@ -77,7 +90,7 @@ Core ML baseline: complete
 
 Storm-level evaluation: complete
 
-Temporal forecasting experiments: in progress
+Temporal forecasting: complete
 
 Explainable inference: complete
 
