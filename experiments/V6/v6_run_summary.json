@@ -1,0 +1,32 @@
+{
+  "experiment": "V6 FAST V4 STACKING / CORRECTION MODEL",
+  "status": "REJECTED_FOR_FINAL_MODEL",
+  "test_used": false,
+  "test_used_for_model_selection": false,
+  "train_samples": 6802,
+  "validation_samples": 758,
+  "train_storms": 33,
+  "meta_features": 53,
+  "selected_model": "logreg_standard",
+  "oof_mean_present_f1": 0.6902,
+  "verified_v4": {
+    "plus6_accuracy": 0.6623,
+    "plus6_present_f1": 0.464,
+    "plus12_accuracy": 0.5462,
+    "plus12_present_f1": 0.386,
+    "mean_present_f1": 0.425
+  },
+  "v6": {
+    "plus6_accuracy": 0.653,
+    "plus6_present_f1": 0.4074,
+    "plus12_accuracy": 0.5475,
+    "plus12_present_f1": 0.3844,
+    "mean_present_f1": 0.3959
+  },
+  "delta_vs_v4": {
+    "plus6_f1": -0.0566,
+    "plus12_f1": -0.0015,
+    "mean_f1": -0.0291
+  },
+  "decision": "Do not use V6 as final model. Internal grouped OOF performance did not transfer to the completely unseen validation storms."
+}
