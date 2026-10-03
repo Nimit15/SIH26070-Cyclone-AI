@@ -1,8 +1,8 @@
-# Final test check
+# Final evaluation
 
-The temporal model was run once on the seven held-out test storms after the V4 checkpoint and decision rule had already been fixed.
+The forecasting model was evaluated once on the seven held-out test storms:
 
-The test set contains 961 sequences.
+ASHOBAA, Fani, HELEN, KYAAR, LEHAR, NILOFAR and PAWAN.
 
 | Metric | +6h | +12h |
 |---|---:|---:|
@@ -13,8 +13,12 @@ The test set contains 961 sequences.
 | Wind MAE | 8.45 kt | 10.80 kt |
 | Wind RMSE | 10.57 kt | 13.97 kt |
 
-Using the frozen structured decision rule gave 54.84% exact accuracy at +6h and 42.25% at +12h. The mean exact accuracy was 48.54%.
+The frozen structured decision rule raised +6h exact accuracy to 54.84%, while +12h remained at 42.25%. The combined exact six-class average was 47.61% for the direct model.
 
-For the project's tolerance-aware view, the mean agreement within one intensity class was 94.59%. This is kept separate from exact six-class accuracy.
+Across both forecast horizons, 93.91% of predictions were within one intensity class of the target.
 
-The test set was not used to choose the model or decision parameters.
+The wind estimates were more stable than the class predictions. For the >=80 kt subset, the +6h MAE was 9.84 kt and the +12h MAE was 15.91 kt.
+
+The direct classifier did not assign the SuCS label to any of the 67 true SuCS cases at either horizon.
+
+The test set was not used to choose the model, thresholds or decision parameters.
