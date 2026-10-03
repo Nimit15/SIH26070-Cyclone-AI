@@ -58,6 +58,20 @@ At the 117.5 kt threshold, corresponding to the project's SuCS boundary, the win
 
 These are threshold-detection results, not six-class classification accuracy.
 
+
+## Final held-out test
+
+The model was evaluated once on seven held-out storms: ASHOBAA, Fani, HELEN, KYAAR, LEHAR, NILOFAR and PAWAN.
+
+The exact six-class accuracy was 52.97% at +6h and 42.25% at +12h. Wind MAE was 8.45 kt and 10.80 kt respectively.
+
+The more useful measure for the forecast is how far the predicted intensity is from the target. Across both horizons, **93.91% of forecasts were within one intensity class of the target**. At +6h this was 95.73% and at +12h it was 92.09%.
+
+Top-2 accuracy was 82.00% at +6h and 69.72% at +12h.
+
+The tolerance-aware figure is reported separately from exact six-class accuracy; it is not presented as six-class accuracy.
+
+
 ## Repository structure
 
     checkpoints/
