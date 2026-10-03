@@ -4,14 +4,14 @@ Explainable cyclone intensity analysis from satellite imagery.
 
 ## Current system
 
-The prototype uses an EfficientNet-B0 backbone with two prediction heads:
+The main spatial model uses EfficientNet-B0 with two outputs:
 
 - cyclone-category classification
 - maximum sustained wind-speed regression
 
-The inference layer combines the visual classifier with the continuous wind estimate. A wind estimate of 117.5 kt or above triggers the SuCS decision because the training distribution separates VSCS (maximum 115 kt) from SuCS (minimum 120 kt).
+The forecasting branch is built on top of the satellite features and recent storm history. Grad-CAM is used to show which parts of the image influenced the visual classification.
 
-Grad-CAM is used to visualize the image regions contributing to the visual classification.
+The category decision currently stays with the classifier. The wind estimate is kept as a separate signal rather than forcing a category change from a hand-written threshold.
 
 ## Dataset methodology
 
@@ -27,7 +27,7 @@ KYAAR is retained as an unseen SuCS test storm. AMPHAN is the SuCS storm in trai
 
 ## Model development
 
-The best validation checkpoint was obtained at epoch 3.
+The strongest spatial baseline was the epoch 3 checkpoint.
 
 Validation results:
 
@@ -36,7 +36,7 @@ Validation results:
 - Wind MAE: 7.02 kt
 - Wind RMSE: 10.09 kt
 
-The model's wind-speed head also showed useful performance on the held-out KYAAR storm.
+The temporal branch has been tested separately using strict storm-level sequences with +6h and +12h targets. The current fallback for that branch is the V4 residual model; newer stacking and external-model experiments have not replaced it.
 
 ## Repository structure
 
@@ -49,6 +49,11 @@ The model's wind-speed head also showed useful performance on the held-out KYAAR
         train_storm_split.csv
         validation_storm_split.csv
         test_storm_split.csv
+
+    experiments/
+        V6/
+        V7-PRE/
+        External-Models/
 
     main.py
     requirements.txt
@@ -68,9 +73,11 @@ The application provides:
 
 ## Status
 
-Core ML model: complete
+Core ML baseline: complete
 
 Storm-level evaluation: complete
+
+Temporal forecasting experiments: in progress
 
 Explainable inference: complete
 
