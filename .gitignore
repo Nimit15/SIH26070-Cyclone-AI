@@ -7,3 +7,4 @@ venv/
 kaggle.json
 *.zip
 *.log
+v4_demo_bundle/

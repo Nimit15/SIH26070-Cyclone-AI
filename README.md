@@ -1,98 +1,124 @@
-# Cyclone Intelligence System
+# CYCLO-INTEL
 
-Explainable cyclone intensity analysis from satellite imagery.
+AI-powered cyclone intelligence for satellite-image analysis, short-term intensity forecasting, explainability, official alerts, and regional-language guidance.
 
-## Overview
+## What it does
 
-The system combines a satellite-image classifier with wind-speed regression and a temporal forecasting branch. The web app provides image-based cyclone analysis with Grad-CAM visualisation.
+- Analyses a cyclone satellite image with EfficientNet-B0
+- Predicts one of six intensity classes: D, DD, CS, SCS, VSCS, SuCS
+- Estimates wind speed separately
+- Shows a Grad-CAM visual explanation
+- Uses the verified V4 temporal model for historical +6h / +12h intensity replay
+- Checks official IMD alerts for the selected State / UT
+- Provides regional-language guidance
+- Links to official IMD, NDMA SACHET, MOSDAC and NASA satellite sources
 
-The forecasting model uses short storm sequences and predicts intensity at +6h and +12h.
+The final decision for a current image is classifier-only. The wind head is shown as a separate estimate and does not override the category.
 
-## Dataset
+The Forecast Replay page is a historical validation demonstration, not a live forecast service. It shows both successful and failed cases.
 
-The evaluation uses storm-level splits so images from the same storm do not appear across train, validation and test.
+## Model and data
 
-- Train: 69,048 images from 33 storms
-- Validation: 1,362 images from 3 storms
-- Test: 2,532 images from 7 storms
+The image model is EfficientNet-B0 with classification and wind-speed regression.
 
-The temporal forecasting dataset contains 8,521 sequences:
+The temporal model uses four ordered satellite frames with temporal attention and physical/context features to forecast intensity at +6h and +12h.
+
+The main image dataset is INCYDE (INSAT-3D, North Indian Ocean). The locked temporal dataset contains 8,521 storm-level sequences:
 
 - Train: 6,802
 - Validation: 758
 - Test: 961
 
-The seven final test storms are ASHOBAA, Fani, HELEN, KYAAR, LEHAR, NILOFAR and PAWAN.
+The final test storms are held out by storm rather than by random image.
 
-## Model
+IBTrACS was used for storm and intensity metadata during dataset preparation. NOAA HURSAT-B1 was investigated as an additional historical source, but it is not a final V4 predictor input.
 
-The image model uses EfficientNet-B0 with two outputs:
+## Final frozen V4 test reference
 
-- intensity category classification
-- maximum sustained wind-speed regression
+| Horizon | Exact accuracy | Macro F1 | Within ±1 severity |
+|---|---:|---:|---:|
+| +6h | 52.97% | 0.3827 | 95.73% |
+| +12h | 42.25% | 0.3324 | 92.09% |
 
-The temporal forecasting model uses satellite feature sequences together with recent model state information. The current forecasting reference is the V4 temporal model.
+Wind MAE:
 
-The system also includes:
+- +6h: 8.45 kt
+- +12h: 10.80 kt
 
-- Grad-CAM visualisation
-- storm-level evaluation
-- +6h and +12h forecasting
-- wind-speed estimates
-- tolerance-aware intensity metrics
+Within ±1 severity is a tolerance metric, not exact classification accuracy.
 
-## Results
+## Run locally
 
-The final frozen test evaluation was performed only after the model and validation-selected decision strategy were fixed.
+Tested setup:
 
-### Exact six-class accuracy
+- Windows
+- Python 3.14
+- PyTorch with CUDA when an NVIDIA GPU is available
 
-| Horizon | Accuracy | Macro F1 |
-| --- | ---: | ---: |
-| +6h | 54.84% | 0.3988 |
-| +12h | 42.25% | 0.3324 |
-
-### Forecast quality
-
-| Horizon | Within ±1 class | 3-level operational |
-| --- | ---: | ---: |
-| +6h | 97.09% | 75.34% |
-| +12h | 92.09% | 69.61% |
-
-The mean exact six-class accuracy across the two horizons is 48.54%. The mean within-one-class agreement is 94.59%.
-
-These metrics are reported separately. Within-one-class agreement is not presented as exact classification accuracy.
-
-## Web app
-
-The application currently supports:
-
-1. satellite-image upload
-2. cyclone category prediction
-3. wind-speed estimation
-4. confidence display
-5. Grad-CAM visualisation
-
-Run locally with:
+Clone the repository and enter it:
 
 ```bash
-pip install -r requirements.txt
+git clone https://github.com/Nimit15/SIH26070-Cyclone-AI.git
+cd SIH26070-Cyclone-AI
+```
+
+Create and activate a virtual environment:
+
+### Windows PowerShell
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+```
+
+Install dependencies:
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+Run the application:
+
+```powershell
 python main.py
 ```
 
-The application uses the checkpoint in `checkpoints/cyclone_best.pt`.
+Open:
 
-## Repository
-
-```
-checkpoints/       model checkpoints
-experiments/       model experiments
-splits/            storm-level dataset splits
-main.py            NiceGUI application
-requirements.txt   Python dependencies
-README.md          project documentation
+```text
+http://127.0.0.1:8000
 ```
 
-## Notes
+The checkpoint is already included at:
 
-The test set contains storms that were not used during training or model selection. The current dataset has limited examples of the highest intensity category, which remains an important limitation for future work.
+```text
+checkpoints/cyclone_best.pt
+```
+
+For an NVIDIA GPU, use a PyTorch build compatible with your driver. CPU inference also works, but will be slower.
+
+## Forecast replay assets
+
+The full four-case replay uses the supplied `v4_demo_bundle` folder. Keep it next to `main.py`.
+
+The main image-analysis application does not depend on the replay bundle. If the bundle is missing, the replay page reports that the historical assets are unavailable instead of blocking the rest of the dashboard.
+
+## Project structure
+
+```text
+main.py                     NiceGUI application
+checkpoints/                final image-model checkpoint
+splits/                     storm-level train/validation/test splits
+experiments/Final-Evaluation final evaluation notes
+requirements.txt            Python dependencies
+README.md                   project and run instructions
+```
+
+## Online deployment
+
+The submission version is a local Python application so it can be demonstrated reliably. An online deployment can be added after submission on a GPU-capable host or container platform without changing the model itself.
+
+## Safety
+
+CYCLO-INTEL is decision support. It does not replace official IMD, RSMC, NDMA or state-authority warnings.
