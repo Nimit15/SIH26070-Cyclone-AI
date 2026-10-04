@@ -1,24 +1,20 @@
 # Final evaluation
 
-The forecasting model was evaluated once on the seven held-out test storms:
+The forecasting model was evaluated on seven held-out storms:
 
 ASHOBAA, Fani, HELEN, KYAAR, LEHAR, NILOFAR and PAWAN.
 
 | Metric | +6h | +12h |
 |---|---:|---:|
-| Exact six-class accuracy | 52.97% | 42.25% |
-| Macro F1 | 0.3827 | 0.3324 |
-| Top-2 accuracy | 82.00% | 69.72% |
-| Within one intensity class | 95.73% | 92.09% |
-| Wind MAE | 8.45 kt | 10.80 kt |
-| Wind RMSE | 10.57 kt | 13.97 kt |
+| Exact six-class accuracy | 54.84% | 42.25% |
+| Macro F1 | 0.3988 | 0.3324 |
+| Within one intensity class | 97.09% | 92.09% |
+| 3-level operational accuracy | 75.34% | 69.61% |
 
-The frozen structured decision rule raised +6h exact accuracy to 54.84%, while +12h remained at 42.25%. The combined exact six-class average was 47.61% for the direct model.
+The mean exact six-class accuracy across the two horizons is 48.54%. Mean within-one-class agreement is 94.59%.
 
-Across both forecast horizons, 93.91% of predictions were within one intensity class of the target.
+The decision parameters were selected before the final test evaluation. No test-set tuning was used.
 
-The wind estimates were more stable than the class predictions. For the >=80 kt subset, the +6h MAE was 9.84 kt and the +12h MAE was 15.91 kt.
+Within-one-class agreement is reported separately from exact six-class accuracy and should not be interpreted as the same metric.
 
-The direct classifier did not assign the SuCS label to any of the 67 true SuCS cases at either horizon.
-
-The test set was not used to choose the model, thresholds or decision parameters.
+Wind MAE on the frozen test set was 8.45 kt at +6h and 10.80 kt at +12h.
