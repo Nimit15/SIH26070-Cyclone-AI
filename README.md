@@ -2,118 +2,97 @@
 
 Explainable cyclone intensity analysis from satellite imagery.
 
-## Current system
+## Overview
 
-The main spatial model uses EfficientNet-B0 with two outputs:
+The system combines a satellite-image classifier with wind-speed regression and a temporal forecasting branch. The web app provides image-based cyclone analysis with Grad-CAM visualisation.
 
-- cyclone-category classification
-- maximum sustained wind-speed regression
+The forecasting model uses short storm sequences and predicts intensity at +6h and +12h.
 
-The forecasting branch works from satellite features and recent storm history. Grad-CAM is used to show which parts of the image influenced the visual classification.
+## Dataset
 
-The category decision stays with the classifier. The wind estimate is kept as a separate signal rather than forcing a category change from a hand-written threshold.
-
-## Dataset methodology
-
-The dataset was evaluated at storm level rather than by randomly splitting individual images.
-
-Current locked split:
+The evaluation uses storm-level splits so images from the same storm do not appear across train, validation and test.
 
 - Train: 69,048 images from 33 storms
 - Validation: 1,362 images from 3 storms
 - Test: 2,532 images from 7 storms
 
-KYAAR is retained as an unseen SuCS test storm. AMPHAN is the SuCS storm in training.
+The temporal forecasting dataset contains 8,521 sequences:
 
-## Model development
+- Train: 6,802
+- Validation: 758
+- Test: 961
 
-The strongest spatial baseline was the epoch 3 checkpoint.
+The seven final test storms are ASHOBAA, Fani, HELEN, KYAAR, LEHAR, NILOFAR and PAWAN.
 
-Validation results:
+## Model
 
-- Accuracy: 66.15%
-- Macro F1: 62.37%
-- Wind MAE: 7.02 kt
-- Wind RMSE: 10.09 kt
+The image model uses EfficientNet-B0 with two outputs:
 
-The temporal branch uses strict storm-level sequences with +6h and +12h targets.
+- intensity category classification
+- maximum sustained wind-speed regression
 
-On the three held-out validation storms, the V4 forecast achieved:
+The temporal forecasting model uses satellite feature sequences together with recent model state information. The current forecasting reference is the V4 temporal model.
 
-- +6h exact six-class accuracy: 66.23%
-- +12h exact six-class accuracy: 54.62%
-- +6h accuracy within one adjacent intensity class: 95.38%
-- +12h accuracy within one adjacent intensity class: 90.37%
-- +6h top-2 accuracy: 87.86%
+The system also includes:
 
-The test-set check was run only after the model and decision rule were fixed. On the seven held-out test storms, exact six-class accuracy was 52.97% at +6h and 42.25% at +12h. The corresponding within-one-class agreement was 95.73% and 92.09%. The mean tolerance-aware agreement was 94.59%. These figures are kept separate from exact six-class accuracy.
+- Grad-CAM visualisation
+- storm-level evaluation
+- +6h and +12h forecasting
+- wind-speed estimates
+- tolerance-aware intensity metrics
 
-The V4 temporal model remains the main forecasting reference. A small spatial residual experiment gave only a marginal early improvement, so it was not adopted as the main model.
+## Results
 
-## Test alert checks
+The final frozen test evaluation was performed only after the model and validation-selected decision strategy were fixed.
 
-The held-out test set was also checked using the fixed wind thresholds from the training set. For detecting whether a forecast is at least Severe Cyclonic Storm strength (62.5 kt), the accuracy was 95.73% at +6h and 91.88% at +12h, or 93.81% across the two horizons.
+### Exact six-class accuracy
 
-At the 117.5 kt threshold, corresponding to the project's SuCS boundary, the wind estimate correctly identified the threshold condition 98.34% at +6h and 97.71% at +12h (98.02% across both horizons).
+| Horizon | Accuracy | Macro F1 |
+| --- | ---: | ---: |
+| +6h | 54.84% | 0.3988 |
+| +12h | 42.25% | 0.3324 |
 
-These are threshold-detection results, not six-class classification accuracy.
+### Forecast quality
 
+| Horizon | Within ±1 class | 3-level operational |
+| --- | ---: | ---: |
+| +6h | 97.09% | 75.34% |
+| +12h | 92.09% | 69.61% |
 
-## Final held-out test
+The mean exact six-class accuracy across the two horizons is 48.54%. The mean within-one-class agreement is 94.59%.
 
-The model was evaluated once on seven held-out storms: ASHOBAA, Fani, HELEN, KYAAR, LEHAR, NILOFAR and PAWAN.
+These metrics are reported separately. Within-one-class agreement is not presented as exact classification accuracy.
 
-The exact six-class accuracy was 52.97% at +6h and 42.25% at +12h. Wind MAE was 8.45 kt and 10.80 kt respectively.
+## Web app
 
-The more useful measure for the forecast is how far the predicted intensity is from the target. Across both horizons, **93.91% of forecasts were within one intensity class of the target**. At +6h this was 95.73% and at +12h it was 92.09%.
-
-Top-2 accuracy was 82.00% at +6h and 69.72% at +12h.
-
-The tolerance-aware figure is reported separately from exact six-class accuracy; it is not presented as six-class accuracy.
-
-
-## Repository structure
-
-    checkpoints/
-        cnn_day3_smoketest.pt
-        cyclone_best.pt
-        cyclone_best_metadata.json
-
-    splits/
-        train_storm_split.csv
-        validation_storm_split.csv
-        test_storm_split.csv
-
-    experiments/
-        V6/
-        V7-PRE/
-        V7-Residual/
-        External-Models/
-
-    main.py
-    requirements.txt
-    README.md
-
-## Run locally
-
-    pip install -r requirements.txt
-    python main.py
-
-The application provides:
+The application currently supports:
 
 1. satellite-image upload
 2. cyclone category prediction
 3. wind-speed estimation
-4. Grad-CAM explanation
+4. confidence display
+5. Grad-CAM visualisation
 
-## Status
+Run locally with:
 
-Core ML baseline: complete
+```bash
+pip install -r requirements.txt
+python main.py
+```
 
-Storm-level evaluation: complete
+The application uses the checkpoint in `checkpoints/cyclone_best.pt`.
 
-Temporal forecasting: complete
+## Repository
 
-Explainable inference: complete
+```
+checkpoints/       model checkpoints
+experiments/       model experiments
+splits/            storm-level dataset splits
+main.py            NiceGUI application
+requirements.txt   Python dependencies
+README.md          project documentation
+```
 
-Web application: in development
+## Notes
+
+The test set contains storms that were not used during training or model selection. The current dataset has limited examples of the highest intensity category, which remains an important limitation for future work.
